@@ -1,0 +1,12 @@
+{
+    "firstName": "Ulrich",
+    "lastName": "Jiogang",
+    "gender": "man",
+    "age": 22,
+    "address": {
+        "streetAddress": "126 Udhna",
+        "city": "san jone",
+        "state": "CA",
+        "postalCode": "394221"
+    }
+}
