@@ -8,11 +8,14 @@ public class Labyrinthe
     private int nLab;
     private int mLab;
     private int nbNoueds;
-    private Graphe copieGr;
+//    private Graphe copieGr;
     private Graphe labFInal;
     private ArrayList<Integer> nouedVisiter;
     private int nombreO;
     private int nombreHastag;
+    private int compteurInit;
+    private int compteurLabyr;
+    private int compteurAffichage;
 
     public int getNouedVisiter()
     {
@@ -39,36 +42,18 @@ public class Labyrinthe
         labFInal = new Graphe(m , n);
         nbNoueds = m * n;
         nouedVisiter = new ArrayList<Integer>();
-        genereEntreeSortie();
-//        ponderationGraphe();
+        compteurInit = 0;
+        compteurAffichage = 0;
+        compteurLabyr = 0;
     }
 
-    public void setEntreeLabyr(int[] entreeLabyr)
-    {
-        this.entreeLabyr = entreeLabyr;
-    }
-
-    public void setSortieLabyr(int[] sortieLabyr)
-    {
-        this.sortieLabyr = sortieLabyr;
-    }
-
-    public void setGrapheLabyr(Graphe grapheLabyr)
-    {
-        this.grapheLabyr = grapheLabyr;
-    }
-
-    private void genereLabyrinthe()
+    public void generGraphe()
     {
         genereEntreeSortie();
         ponderationGraphe();
     }
 
-    public Graphe getCopieGr()
-    {
-        return copieGr;
-    }
-
+    //methode generant de maniere aleatoire l'entrer et la sortie du labyrinthe
     private void genereEntreeSortie()
     {
         entreeLabyr[0] = nombreAleatoire(mLab) - 1;
@@ -82,166 +67,96 @@ public class Labyrinthe
         while ((entreeLabyr[0] == sortieLabyr[0]) && (entreeLabyr[1] == sortieLabyr[1]));
     }
 
-    public void ponderationGraphe()
+    private void ponderationGraphe()
     {
 
         int i ;
         int j;
-        int coin = 0, lien3 = 0, centre = 0;
 
+        compteurInit += 2;
+        //la ponderation du graphe se fait en ponderant les liaisons de chaque noeuds
         for (int k = 0; k < nbNoueds; k++)
         {
+            //on determine l'equivalent des coordonnes de la matrice adjacente dans notre graphe
             i = k / nLab;
             j = k % nLab;
+            compteurInit += 2;
 
+            //la ponderation est decide en fonction du type de noeud il en existe 3 :
+            //ceux au coin qui n'ont que deux liens
+            //ceux de au bord ou de type 3Loin qui n'ont que trois liens
+            //Et le reste les noeuds a 4 lien
+            //Ainsi grace au coordonne on peut determiner quel type de noeud on a affaire et dans quel sens sonst ses
+            //liaisons
+            //la methode etablissementDeLiason() permet de ponderer un noeud en lui donnant des coordonnes et le sens de
+            //la ponderation
             if (siCoin(i, j))
             {
-                coin++;
                 switch (typeCoin(i, j))
                 {
                     case basgauche -> {
-//                        System.out.println("basgauche");
-
-
                         etablissementDeLiason(i, j , k, Orientation.nord);
                         etablissementDeLiason(i, j , k, Orientation.est);
-
-//                        //nord
-//                        grapheLabyr.liason(k, deijAJgraphe(i - 1, j), nombreAleatoire(10));
-//                        //east
-//                        grapheLabyr.liason(k, deijAJgraphe(i, j + 1), nombreAleatoire(10));
                     }
                     case basdroit -> {
-//                        System.out.println("basdroit");
-
-
                         etablissementDeLiason(i, j , k, Orientation.nord);
                         etablissementDeLiason(i, j , k, Orientation.ouest);
-
-//                        //nord
-//                        grapheLabyr.liason(k, deijAJgraphe(i - 1, j), nombreAleatoire(10));
-//                        //west
-//                        grapheLabyr.liason(k , deijAJgraphe(i, j - 1), nombreAleatoire(10));
                     }
-
                     case hautguache -> {
-
-//                        System.out.println("hautguache");
-
                         etablissementDeLiason(i, j , k, Orientation.sud);
                         etablissementDeLiason(i, j , k, Orientation.est);
-
-//                        //east
-//                        grapheLabyr.liason(k , deijAJgraphe(i, j + 1), nombreAleatoire(10));
-//                        //sud
-//                        grapheLabyr.liason(k , deijAJgraphe(i + 1, j), nombreAleatoire(10));
                     }
                     case hautdroit -> {
-
-//                        System.out.println("hautdroit");
-
                         etablissementDeLiason(i, j , k, Orientation.sud);
                         etablissementDeLiason(i, j , k, Orientation.ouest);
-
-//                        //sud
-//                        grapheLabyr.liason(k , deijAJgraphe(i + 1, j), nombreAleatoire(10));
-//                        //west
-//                        grapheLabyr.liason(k , deijAJgraphe(i , j- 1), nombreAleatoire(10));
                     }
                 }
+                compteurInit += 2;
             }
             else if (si3Lien(i, j))
             {
-                lien3++;
                 switch (type3Loin(i, j))
                 {
                     case aucunBas -> {
-//                        System.out.println("aucunBas");
-
                         etablissementDeLiason(i, j , k, Orientation.nord);
                         etablissementDeLiason(i, j , k, Orientation.est);
                         etablissementDeLiason(i, j , k, Orientation.ouest);
-
-//                        //nord
-//                        grapheLabyr.liason(k, deijAJgraphe(i - 1, j), nombreAleatoire(10));
-//                        //west
-//                        grapheLabyr.liason(k , deijAJgraphe(i,  - 1), nombreAleatoire(10));
-//                        //east
-//                        grapheLabyr.liason(k , deijAJgraphe(i, j + 1), nombreAleatoire(10));
                     }
 
                     case aucunHaut -> {
-//                        System.out.println("aucunHaut");
-
                         etablissementDeLiason(i, j , k, Orientation.sud);
                         etablissementDeLiason(i, j , k, Orientation.est);
                         etablissementDeLiason(i, j , k, Orientation.ouest);
-
-//                        //west
-//                        grapheLabyr.liason(k , deijAJgraphe(i,  j- 1), nombreAleatoire(10));
-//                        //east
-//                        grapheLabyr.liason(k , deijAJgraphe(i, j + 1), nombreAleatoire(10));
-//                        //sud
-//                        grapheLabyr.liason(k , deijAJgraphe(i + 1, j), nombreAleatoire(10));
                     }
 
                     case aucunDroit -> {
-
-
-//                        System.out.println("hein");
-
                         etablissementDeLiason(i, j , k, Orientation.nord);
                         etablissementDeLiason(i, j , k, Orientation.sud);
                         etablissementDeLiason(i, j , k, Orientation.ouest);
-//                        System.out.println("aucunDroit");
-//                        //nord
-//                        grapheLabyr.liason(k, deijAJgraphe(i - 1, j), nombreAleatoire(10));
-//                        //west
-//                        grapheLabyr.liason(k , deijAJgraphe(i ,j- 1), nombreAleatoire(10));
-//                        //sud
-//                        grapheLabyr.liason(k , deijAJgraphe(i + 1, j), nombreAleatoire(10));
                     }
 
                     case aucunGuache -> {
-//                        System.out.println("aucunGuache");
-
                         etablissementDeLiason(i, j , k, Orientation.nord);
                         etablissementDeLiason(i, j , k, Orientation.sud);
                         etablissementDeLiason(i, j , k, Orientation.est);
-//                        System.out.println("aucunGuache");
-
-//                        //nord
-//                        grapheLabyr.liason(k, deijAJgraphe(i - 1, j), nombreAleatoire(10));
-//                        //east
-//                        grapheLabyr.liason(k , deijAJgraphe(i, j + 1), nombreAleatoire(10));
-//                        //sud
-//                        grapheLabyr.liason(k , deijAJgraphe(i + 1, j), nombreAleatoire(10));
                     }
                 }
+                compteurInit += 3;
             }
             else
             {
-//                centre++;
-
                 etablissementDeLiason(i, j , k, Orientation.nord);
                 etablissementDeLiason(i, j , k, Orientation.sud);
                 etablissementDeLiason(i, j , k, Orientation.est);
                 etablissementDeLiason(i, j , k, Orientation.ouest);
-//                //nord
-//                grapheLabyr.liason(k, deijAJgraphe(i - 1, j), nombreAleatoire(10));
-//                //west
-//                grapheLabyr.liason(k , deijAJgraphe(i,  - 1), nombreAleatoire(10));
-//                //east
-//                grapheLabyr.liason(k , deijAJgraphe(i, j + 1), nombreAleatoire(10));
-//                //sud
-//                grapheLabyr.liason(k , deijAJgraphe(i + 1, j), nombreAleatoire(10));
+                compteurInit += 4;
             }
         }
-//        System.out.println("noeud au coin : " + coin);
-//        System.out.println("noeud de 3 lien : " + lien3);
-//        System.out.println("noeud au centre : " + centre);
     }
 
+    //Ici on pondere chaque un noeud dans un sens
+    //on regarde d'abord si la liaison dans sons sens est etabli si c'est le cas on genere le poids alleatiorement
+    //si non on pondere la reciproque de la liaison dans la matrice adjacente
     private void etablissementDeLiason(int i, int j, int k, Orientation orientation)
     {
         switch (orientation)
@@ -298,175 +213,117 @@ public class Labyrinthe
 
     public void algorithmPrim()
     {
-        copieGr = new Graphe(grapheLabyr);
         int iG = deijAJgraphe(entreeLabyr[0], entreeLabyr[1]);
 
         nouedVisiter.add(iG);
 
         ArrayList<Integer[]> lesPlusPetitsElementsdesLignes = new ArrayList<>();
         Integer[] lienMinimal;
-        int o = 0;
+//        int o = 0;
+        compteurLabyr += 4;
 
+        //Dans notre matrice adjacente chaque ligne reprensete un noeud
+        //La maniere dont l'algorithme fonction est que on parcout chaque noeud(ligne dans la matrice adjacente)
+        //on regarde la liaison la plus petit du noeud on la conserve et on lui compare a la liaison la plus petite de
+        //chaque noeud qui on ete visiter pour selectionner la plus petite liaison parmi tout les candidates
+        //cette liaison et donc inscrit dans le graphe finale
         for (int i = 0; i < nbNoueds - 2; i++)
-//        while (nouedVisiter.size() < nbNoueds)
         {
-//            if (i == 5)
-//                System.out.println("yo");
+            compteurLabyr++;
             for (Integer ligne: nouedVisiter)
             {
                 lesPlusPetitsElementsdesLignes.add(plusPetitDeLigne(grapheLabyr.getRows(ligne), ligne, false));
-//                    lesPlusPetitsElementsdesLignes.add(plusPetitDeLigne(grapheLabyr.getRows(nouedVisiter.get(ligne)), nouedVisiter.get(ligne)));
+                compteurLabyr++;
             }
+
             lienMinimal = plusPetitParmisLesPlusPetits(lesPlusPetitsElementsdesLignes, nouedVisiter);
             grapheLabyr.liason(lienMinimal[2], lienMinimal[0], 0);
             grapheLabyr.liason(lienMinimal[0], lienMinimal[2], 0);
 
             labFInal.liason(lienMinimal[2], lienMinimal[0], 1);
+            compteurLabyr += 4;
+
 
             if(labFInal.getElement(lienMinimal[0], lienMinimal[2]) == 0 )
+            {
                 labFInal.liason(lienMinimal[0], lienMinimal[2], 1);
+                compteurLabyr ++;
+            }
 
             if (!nouedVisiter.contains(lienMinimal[0]))
+            {
                 nouedVisiter.add(lienMinimal[0]);
+                compteurLabyr++;
+            }
 
             lesPlusPetitsElementsdesLignes.clear();
-//            System.out.println(nouedVisiter.size());
-
-//            System.out.println(toStringLaby(labFInal));
-            o++;
+            compteurLabyr++;
         }
 
+        Integer[] lienversortie = plusPetitDeLigne(grapheLabyr.getRows(deijAJgraphe(sortieLabyr[0], sortieLabyr[1])), deijAJgraphe(sortieLabyr[0], sortieLabyr[1]), true);
+        labFInal.liason(lienversortie[2], lienversortie[0], 1);
+        compteurLabyr += 2;
 
-
+        if(labFInal.getElement(lienversortie[0], lienversortie[2]) == 0 )
+        {
+            labFInal.liason(lienversortie[0], lienversortie[2], 1);
+            compteurLabyr++;
+        }
         grapheLabyr = labFInal;
-        String affiche = toStringLaby();
-        int count = 0;
-        for (int i = 0; i < affiche.length(); i++) {
-            if (affiche.charAt(i) == '#') {
-                count++;
-            }
-        }
-
-        nombreO = o;
-        nombreHastag = count - 2;
-        System.out.println("dasdasdasdasdasdasdasdas : " + nouedVisiter.size());
-        System.out.println("Nombre # : " + nombreHastag);
-        System.out.println("Nombre o : " + o);
-
+        compteurLabyr++;
     }
 
+
+//        System.out.println("dasdasdasdasdasdasdasdas : " + nouedVisiter.size());
+//        System.out.println("Nombre # : " + nombreHastag);
+//        System.out.println("Nombre o : " + o);
+    //la methode determine la liaison la plus petite parmi plusieurs candidats
     private Integer[] plusPetitParmisLesPlusPetits(ArrayList<Integer[]> listeDesplusPetits, ArrayList<Integer> nouedV)
     {
         int position = 0;
-        int doublon = -1;
 
         if (listeDesplusPetits.size() == 1)
         {
-                return listeDesplusPetits.get(0);
+            return listeDesplusPetits.get(0);
         }
         else
         {
             for (int i = 1; i < listeDesplusPetits.size(); i++)
             {
-
                 if(listeDesplusPetits.get(position)[1] > listeDesplusPetits.get(i)[1])
                 {
-//                    System.out.println("rien");
                     position = i;
                 }
                 else if ((listeDesplusPetits.get(position)[1] == listeDesplusPetits.get(i)[1]) && listeDesplusPetits.get(position)[1] != 11)
                 {
-//                    System.out.println("doublon : " + listeDesplusPetits.get(position)[1]);
-                    int a = nombreLien(labFInal.getRows(listeDesplusPetits.get(position)[0]));
-                    int b = nombreLien(labFInal.getRows(listeDesplusPetits.get(i)[0]));
-
-                    int c = nombreLien(labFInal.getRows(listeDesplusPetits.get(position)[2]));
-                    int d = nombreLien(labFInal.getRows(listeDesplusPetits.get(i)[2]));
-
                     if (nombreLien(labFInal.getRows(listeDesplusPetits.get(position)[0])) > nombreLien(labFInal.getRows(listeDesplusPetits.get(i)[0])))
                     {
-
-                        System.out.println("1ere cas ");
-//                        grapheLabyr.liason(listeDesplusPetits.get(position)[2], listeDesplusPetits.get(position)[0], 0);
-//
-//                        //reciprocite
-//                        grapheLabyr.liason(listeDesplusPetits.get(position)[0], listeDesplusPetits.get(position)[2], 0);
-                    position = i;
+                        position = i;
                     }
                     else
                     {
-                        System.out.println("2eme cas ");
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[2], listeDesplusPetits.get(i)[0], 0);
-//
-//                        //reciprocite
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[0], listeDesplusPetits.get(i)[2], 0);
                         listeDesplusPetits.get(i)[1] = 11;
                     }
-//                    else if(nombreLien(labFInal.getRows(listeDesplusPetits.get(position)[0])) < nombreLien(labFInal.getRows(listeDesplusPetits.get(i)[0])))
-//                    {
-//                        System.out.println("2eme cas ");
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[2], listeDesplusPetits.get(i)[0], 0);
-//
-//                        //reciprocite
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[0], listeDesplusPetits.get(i)[2], 0);
-//                        listeDesplusPetits.get(i)[1] = 11;
-//                    }
-//                    else
-//                    {
-//                        System.out.println("egalite");
-//                    }
-
-
-
-
-//                  System.out.println("doublon");
-//                   doublon = i;
-//                    grapheLabyr.liason(listeDesplusPetits.get(i)[2], listeDesplusPetits.get(i)[0], 0);
-
-//                    if(grapheLabyr.getElement(listeDesplusPetits.get(i)[0], listeDesplusPetits.get(i)[2]) == 0 )
-//                    {
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[0], listeDesplusPetits.get(i)[2], 0);
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[2], listeDesplusPetits.get(i)[0], 0);
-//                    }
-//                    else
-//                    {
-//                        grapheLabyr.liason(listeDesplusPetits.get(i)[2], listeDesplusPetits.get(i)[0], 0);
-//                    }
-
-
-//                    listeDesplusPetits.get(i)[1] = 11;
                 }
             }
         }
-
-
         return listeDesplusPetits.get(position);
-
     }
 
+    //determine le nombre de lien dans un graphe
     private int nombreLien(int[] row)
     {
         int n = 0;
-
         for (int i = 0; i < row.length; i++)
         {
-//            System.out.println("stuck");
             if (row[i] != 0)
                 n++;
         }
-//
-//        while (n < row.length)
-//        {
-//
-//            if (row[n] != 0)
-//                n++;
-//        }
-
         return n;
-
     }
 
 
+    //la methode determine la liaison la plus petite d'un noeud(ligne de matrice adjacente)
     private Integer[] plusPetitDeLigne(int[] ligne, int iLigne, boolean sortie)
     {
         Integer[] positionValeurLigne = new Integer[3];
@@ -488,7 +345,7 @@ public class Labyrinthe
                 }
                 else
                 {
-                    if (poids > ligne[i])
+                    if (poids > ligne[i] && i != deijAJgraphe(entreeLabyr[0], entreeLabyr[1]))
                     {
                         positionduplusPetit = i;
                         poids = ligne[i];
@@ -497,177 +354,44 @@ public class Labyrinthe
             }
         }
 
-//        if(nouedVisiter.contains(ligne[i]))
-//        {
-//            grapheLabyr.liason(i, iLigne, 0);
-//            //reciprocite
-//            grapheLabyr.liason(iLigne, i, 0);
-//
-//        }
-
-
-        if(nouedVisiter.contains(positionduplusPetit))
+        if (!sortie)
         {
-//            System.out.println("position plus petit : " + positionduplusPetit + "ligne : " + iLigne + "poids : " + poids);
-            grapheLabyr.liason(positionduplusPetit, iLigne, 0);
-            //reciprocite
-            grapheLabyr.liason(iLigne, positionduplusPetit, 0);
-            positionValeurLigne[0] = positionduplusPetit;
-            positionValeurLigne[1] = 11;
-
+            if(nouedVisiter.contains(positionduplusPetit) )
+            {
+                grapheLabyr.liason(positionduplusPetit, iLigne, 0);
+                //reciprocite
+                grapheLabyr.liason(iLigne, positionduplusPetit, 0);
+                positionValeurLigne[0] = positionduplusPetit;
+                positionValeurLigne[1] = 11;
+            }
+            else
+            {
+                positionValeurLigne[0] = positionduplusPetit;
+                positionValeurLigne[1] = poids;
+            }
         }
         else
         {
             positionValeurLigne[0] = positionduplusPetit;
             positionValeurLigne[1] = poids;
         }
-
         return positionValeurLigne;
     }
 
-//    private HashMap<Integer, Integer> sortHashmap(HashMap<Integer, Integer> hm)
-//    {
-//
-//        Collections.sort(hm, new Comparator<Map.Entry<String, Integer> >() {
-//            public int compare(Map.Entry<String, Integer> o1,
-//                               Map.Entry<String, Integer> o2)
-//            {
-//                return (o1.getValue()).compareTo(o2.getValue());
-//            }
-//        });
-//
-//        // put data from sorted list to hashmap
-//        HashMap<String, Integer> temp = new LinkedHashMap<String, Integer>();
-//        for (Map.Entry<String, Integer> aa : hm) {
-//            temp.put(aa.getKey(), aa.getValue());
-//        }
-//        return temp;
-//
-//    }
 
-
-    public Graphe getGrapheLabyr()
-    {
-        return grapheLabyr;
-    }
-
+    //equivalent des coordonnes d'un graphe a celui d'une matrice adjacente
     public int deijAJgraphe(int i, int j)
     {
         return (nLab * i) + j;
     }
 
-//    public void ponderationGraphe()
-//    {
-//        for (int i = 0; i < nbNoueds; i++)
-//        {
-//            for (int j = 0; j < nbNoueds; j++)
-//            {
-//                if (siCoin(i, j))
-//                {
-//                    switch (typeCoin(i, j))
-//                    {
-//                        case basgauche -> {
-//                            System.out.println("basgauche");
-//
-//                            //nord
-//                            grapheLabyr.liason(i - 1, j, nombreAleatoire(10));
-//                            //east
-//                            grapheLabyr.liason(i , j + 1, nombreAleatoire(10));
-//
-//                        }
-//
-//                        case basdroit -> {
-//                            System.out.println("basdroit");
-//
-//                            //nord
-//                            grapheLabyr.liason(i - 1, j, nombreAleatoire(10));
-//                            //west
-//                            grapheLabyr.liason(i , j - 1, nombreAleatoire(10));
-//                        }
-//
-//                        case hautguache -> {
-//                            System.out.println("hautguache");
-//
-//                            //east
-//                            grapheLabyr.liason(i , j + 1, nombreAleatoire(10));
-//                            //sud
-//                            grapheLabyr.liason(i + 1, j, nombreAleatoire(10));
-//
-//                        }
-//
-//                        case hautdroit -> {
-//                            System.out.println("hautdroit");
-//                            //sud
-//                            grapheLabyr.liason(i + 1, j, nombreAleatoire(10));
-//                            //west
-//                            grapheLabyr.liason(i , j - 1, nombreAleatoire(10));
-//
-//                        }
-//                    }
-//                }
-//                else if (si3Lien(i, j))
-//                {
-//                    switch (type3Loin(i, j))
-//                    {
-//                        case aucunBas -> {
-//                            //nord
-//                            grapheLabyr.liason(i - 1, j, nombreAleatoire(10));
-//                            //west
-//                            grapheLabyr.liason(i , j - 1, nombreAleatoire(10));
-//                            //east
-//                            grapheLabyr.liason(i , j + 1, nombreAleatoire(10));
-//                        }
-//
-//                        case aucunHaut -> {
-//                            //west
-//                            grapheLabyr.liason(i , j - 1, nombreAleatoire(10));
-//                            //east
-//                            grapheLabyr.liason(i , j + 1, nombreAleatoire(10));
-//                            //sud
-//                            grapheLabyr.liason(i + 1, j, nombreAleatoire(10));
-//                        }
-//
-//                        case aucunDroit -> {
-//                            //nord
-//                            grapheLabyr.liason(i - 1, j, nombreAleatoire(10));
-//                            //west
-//                            grapheLabyr.liason(i , j - 1, nombreAleatoire(10));
-//                            //sud
-//                            grapheLabyr.liason(i + 1, j, nombreAleatoire(10));
-//                        }
-//
-//                        case aucunGuache -> {
-//                            //nord
-//                            grapheLabyr.liason(i - 1, j, nombreAleatoire(10));
-//                            //east
-//                            grapheLabyr.liason(i , j + 1, nombreAleatoire(10));
-//                            //sud
-//                            grapheLabyr.liason(i + 1, j, nombreAleatoire(10));
-//                        }
-//                    }
-//                }
-//                else
-//                {
-//                    //nord
-//                    grapheLabyr.liason(i - 1, j, nombreAleatoire(10));
-//                    //west
-//                    grapheLabyr.liason(i , j - 1, nombreAleatoire(10));
-//                    //east
-//                    grapheLabyr.liason(i , j + 1, nombreAleatoire(10));
-//                    //sud
-//                    grapheLabyr.liason(i + 1, j, nombreAleatoire(10));
-//                }
-//            }
-//        }
-//    }
-
+    //Nous dit si on a affaire a un coin d'apres ses coordonnees
     private boolean siCoin(int i, int j)
     {
-//        return ((i == 0) && (j == 0)) || ((i == nbNoueds - 1) && (j == 0)) || ((i == nbNoueds - 1 ) && (j == nbNoueds - 1)) || ((i == 0) && (j == nbNoueds - 1));
-
         return ((i == 0) && (j == 0)) || ((i == mLab - 1) && (j == 0)) || ((i == mLab - 1 ) && (j == nLab - 1)) || ((i == 0) && (j == nLab - 1));
     }
 
+    //Nous dit si a que type de coin on a affaire d'apres ses coordonnees
     private TypeDeCoin typeCoin(int i, int j)
     {
         if ((i == 0) && (j == 0))
@@ -680,11 +404,13 @@ public class Labyrinthe
             return TypeDeCoin.hautdroit;
     }
 
+    //Nous dit si on a affaire a un coin d'apres ses coordonnees
     private boolean si3Lien(int i, int j)
     {
         return (i == 0) || (j == 0) || (i == mLab - 1 ) || (j == nLab - 1);
     }
 
+    //Nous dit si a que type de noeud a 3Lien on a affaire d'apres ses coordonnees
     private Type3Lien type3Loin(int i, int j)
     {
         if (i == 0)
@@ -697,26 +423,43 @@ public class Labyrinthe
             return Type3Lien.aucunDroit;
     }
 
+
     private int nombreAleatoire(int a)
     {
         return (int) (Math.random() * a) + 1;
     }
 
-    @Override
-    public String toString()
+    public int getCompteurInit()
     {
-        return "Entree i = " + entreeLabyr[0] + ", j = " + entreeLabyr[1] +
-                "\nSortie i = " + sortieLabyr[0] + ", j = " + sortieLabyr[1] +
-                "\nLabyrinthe \n" + grapheLabyr;
+        return compteurInit;
     }
 
-    public String toStringLaby()
+    public int getCompteurTotal()
+    {
+        return compteurInit + compteurLabyr + compteurLabyr;
+    }
+
+    public int getCompteurLabyr()
+    {
+        return compteurLabyr;
+    }
+
+    public int getCompteurAffichage()
+    {
+        return compteurAffichage;
+    }
+
+    @Override
+    public String toString()
     {
         String affichage = "";
         String firstLigne = "";
         String secondLigne = "";
+
+        compteurAffichage += 3;
         for (int i = 0; i < mLab; i++)
         {
+            compteurAffichage++;
             for (int j = 0; j < nLab; j++)
             {
                 if (i == entreeLabyr[0] && j == entreeLabyr[1])
@@ -731,10 +474,10 @@ public class Labyrinthe
                 {
                     firstLigne += " 0 ";
                 }
+                compteurAffichage++;
 
                 if (j + 1 < nLab)
                 {
-                    //                    grapheLabyr.getElement(deijAJgraphe(i, j + 1) , deijAJgraphe(i, j)    est
                     if (grapheLabyr.getElement(deijAJgraphe(i, j + 1), deijAJgraphe(i, j)) != 0)
                     {
                         firstLigne += " 0 ";
@@ -744,11 +487,10 @@ public class Labyrinthe
                         firstLigne += " # ";
                     }
                 }
-//                deijAJgraphe(i + 1, j)
+                compteurAffichage++;
+
                 if (i + 1 < mLab)
                 {
-//                        System.out.println(i +  "      " + j);
-                    //                    grapheLabyr.getElement(deijAJgraphe(i + 1, j), deijAJgraphe(i, j)     sud
                     if (grapheLabyr.getElement(deijAJgraphe(i + 1, j), deijAJgraphe(i, j)) != 0)
                     {
                         secondLigne += " 0 ";
@@ -758,111 +500,32 @@ public class Labyrinthe
                         secondLigne += " # ";
                     }
                 }
+                compteurAffichage++;
 
                 if ((j + 1 < nLab ))
                 {
-
                     secondLigne += " # ";
 
                 }
-
-//                affichage = "\n" + firstLigne + "\n" + secondLigne + "\n";
-//                System.out.println(firstLigne);
-//                System.out.println(secondLigne);
+                compteurAffichage++;
 
             }
             affichage += "\n" + firstLigne + "\n" + secondLigne;
-//            System.out.println(firstLigne);
-//            System.out.println(secondLigne);
             firstLigne = "";
             secondLigne = "";
-
+            compteurAffichage += 3;
         }
 
+        compteurAffichage++;
         return affichage;
     }
 
-    public String toStringLaby(Graphe graphe)
+
+
+    public String toStringGraphe()
     {
-        String affichage = "";
-        String firstLigne = "";
-        String secondLigne = "";
-        for (int i = 0; i < mLab; i++)
-        {
-            for (int j = 0; j < nLab; j++)
-            {
-                if (i == entreeLabyr[0] && j == entreeLabyr[1])
-                {
-                    firstLigne += "E";
-                }
-                else if (i == sortieLabyr[0] && j == sortieLabyr[1])
-                {
-                    firstLigne += "S";
-                }
-                else
-                {
-                    firstLigne += "0";
-                }
-
-                if (j + 1 < nLab)
-                {
-                    //                    grapheLabyr.getElement(deijAJgraphe(i, j + 1) , deijAJgraphe(i, j)    est
-                    if (graphe.getElement(deijAJgraphe(i, j + 1), deijAJgraphe(i, j)) != 0)
-                    {
-                        firstLigne += "0";
-                    }
-                    else
-                    {
-                        firstLigne += "#";
-                    }
-                }
-//                deijAJgraphe(i + 1, j)
-                if (i + 1 < mLab)
-                {
-//                        System.out.println(i +  "      " + j);
-                    //                    grapheLabyr.getElement(deijAJgraphe(i + 1, j), deijAJgraphe(i, j)     sud
-                    if (graphe.getElement(deijAJgraphe(i + 1, j), deijAJgraphe(i, j)) != 0)
-                    {
-                        secondLigne += "0";
-                    }
-                    else
-                    {
-                        secondLigne += "#";
-                    }
-                }
-
-                if ((j + 1 < nLab ))
-                {
-
-                    secondLigne += "#";
-
-                }
-
-//                affichage = "\n" + firstLigne + "\n" + secondLigne + "\n";
-//                System.out.println(firstLigne);
-//                System.out.println(secondLigne);
-
-            }
-            affichage += "\n" + firstLigne + "\n" + secondLigne;
-//            System.out.println(firstLigne);
-//            System.out.println(secondLigne);
-            firstLigne = "";
-            secondLigne = "";
-
-        }
-
-        return affichage;
+        return "Entree i = " + entreeLabyr[0] + ", j = " + entreeLabyr[1] +
+                "\nSortie i = " + sortieLabyr[0] + ", j = " + sortieLabyr[1] +
+                "\nLabyrinthe \n" + grapheLabyr;
     }
-
-    public int[] getPositionDansGraphe(int j)
-    {
-        int[] position = new int[2];
-
-        position[0] = j / mLab;
-        position[1] = j % nLab;
-
-        return position;
-    }
-
-
 }

@@ -16,13 +16,6 @@ public class Graphe
         m = graphe.getM();
         n = graphe.getN();
         matriceAdjacente = new int[m * n][m * n];
-        for (int i = 0; i < m * n; i++)
-        {
-            for (int j = 0; j < m * n; j++)
-            {
-                matriceAdjacente[i][j] = graphe.getElement(i, j);
-            }
-        }
     }
 
     public void setMatriceAdjacente(int[][] matriceAdjacente)
